@@ -30,82 +30,105 @@ async function filterMatchingDirs(path: string, depth: number) {
 }
 
 export async function nodeclean(userOptions?: Partial<Options>) {
-  const { path, depth, quick, buildDir, lastEdit, isCli } = resolveOptions(userOptions);
+  try {
+    const { path, depth, quick, buildDir, lastEdit, isCli } = resolveOptions(userOptions);
 
-  const filePaths = await filterMatchingDirs(path, depth);
+    const filePaths = await filterMatchingDirs(path, depth);
 
-  //   get last edit time of parent folder
-  const statsPaths = await Promise.all(
-    filePaths.map(async (fp) => {
-      const stats = await stat(fp.replace('node_modules', ''));
-      return { fp, editTime: stats.mtime };
-    }),
-  );
-
-  //   check if parent folder matches last edit time filter && if build dir to delete
-  const matchingPaths = await Promise.all(
-    statsPaths
-      .filter(({ editTime }) => new Date(Date.now() - 86400000 * lastEdit) > editTime)
-      .map(async (folder) => {
-        //  check if contains build dir to delete
-        if (!buildDir) return { ...folder };
-
-        const buildDirPath = join(folder.fp.replace('node_modules', 'dist'));
-
-        let containsBuildDir = false;
-
-        try {
-          await stat(buildDirPath);
-          containsBuildDir = true;
-        } catch (_error) {}
-
-        if (containsBuildDir) return { ...folder, buildDirPath };
-
-        return { ...folder };
+    //   get last edit time of parent folder
+    const statsPaths = await Promise.all(
+      filePaths.map(async (fp) => {
+        const stats = await stat(fp.replace('node_modules', ''));
+        return { fp, editTime: stats.mtime };
       }),
-  );
+    );
 
-  if (matchingPaths.length === 0) return noMatchingPaths(filePaths.length, isCli);
+    //   check if parent folder matches last edit time filter && if build dir to delete
+    const matchingPaths = await Promise.all(
+      statsPaths
+        .filter(({ editTime }) => new Date(Date.now() - 86400000 * lastEdit) > editTime)
+        .map(async (folder) => {
+          //  check if contains build dir to delete
+          if (!buildDir) return { ...folder };
 
-  if (quick) {
-    // delete and return
-    return await foldersToDeleteQuickly(matchingPaths, depth, lastEdit);
+          const buildDirPath = join(folder.fp.replace('node_modules', 'dist'));
+
+          let containsBuildDir = false;
+
+          try {
+            await stat(buildDirPath);
+            containsBuildDir = true;
+          } catch (_error) {}
+
+          if (containsBuildDir) return { ...folder, buildDirPath };
+
+          return { ...folder };
+        }),
+    );
+
+    if (matchingPaths.length === 0) return noMatchingPaths(filePaths.length, isCli);
+
+    if (quick) {
+      // delete and return
+      const confirmDelete = await foldersToDeleteQuickly(matchingPaths, depth, lastEdit);
+
+      if (!confirmDelete) return;
+
+      if (isCli) console.log();
+
+      await Promise.all(
+        matchingPaths.map(async (folder: { buildDirPath: string; fp: string; editTime: Date }) => {
+          await deleteFolder(folder.fp);
+          deleted(folder.fp, isCli);
+          if (folder.buildDirPath) {
+            await deleteFolder(folder.buildDirPath);
+            deleted(folder.buildDirPath, isCli);
+          }
+        }),
+      );
+
+      if (isCli) console.log();
+
+      return;
+    }
+
+    let totalSize = 0;
+
+    const detailedMatchingPaths = await Promise.all(
+      matchingPaths.map(async (mp: { buildDirPath: string; fp: string; editTime: Date }) => {
+        const nmSize = await fastFolderSize(mp.fp);
+        totalSize += nmSize;
+
+        return { ...mp, size: readableBytes(nmSize) };
+      }),
+    );
+
+    const confirmDelete = await foldersToDeleteDetail(
+      detailedMatchingPaths,
+      readableBytes(totalSize),
+      depth,
+      lastEdit,
+    );
+
+    if (!confirmDelete) return;
+
+    if (isCli) console.log();
+
+    await Promise.all(
+      detailedMatchingPaths.map(async (folder) => {
+        await deleteFolder(folder.fp);
+        deleted(folder.fp, isCli);
+        if (folder.buildDirPath) {
+          await deleteFolder(folder.buildDirPath);
+          deleted(folder.buildDirPath, isCli);
+        }
+      }),
+    );
+
+    if (isCli) console.log();
+  } catch (error) {
+    console.log(error);
   }
-
-  let totalSize = 0;
-
-  const detailedMatchingPaths = await Promise.all(
-    matchingPaths.map(async (mp: { buildDirPath: string; fp: string; editTime: Date }) => {
-      const nmSize = await fastFolderSize(mp.fp);
-      totalSize += nmSize;
-
-      return { ...mp, size: readableBytes(nmSize) };
-    }),
-  );
-
-  const confirmDelete = await foldersToDeleteDetail(
-    detailedMatchingPaths,
-    readableBytes(totalSize),
-    depth,
-    lastEdit,
-  );
-
-  if (!confirmDelete) return;
-
-  if (isCli) console.log();
-
-  await Promise.all(
-    detailedMatchingPaths.map(async (folder) => {
-      await deleteFolder(folder.fp);
-      deleted(folder.fp, isCli);
-      if (folder.buildDirPath) {
-        await deleteFolder(folder.buildDirPath);
-        deleted(folder.buildDirPath, isCli);
-      }
-    }),
-  );
-
-  if (isCli) console.log();
 }
 
 async function deleteFolder(path) {

@@ -14,7 +14,7 @@ program
   .option('-b --build-dir [buildDirName]', 'delete the build directory as well as node_module')
   .option('-q --quick', `don't bother calculating the size of folders`)
   .action((options) => {
-    require('../dist/commands/nodeclean').default(options);
+    require('../dist/commands/nodeclean').default({ ...options, isCli: true });
   });
 
 program.parse(process.argv);

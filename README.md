@@ -1,4 +1,4 @@
-# Node Clean
+# Nodeclean
 
 Global CLI utility for removing those pesky node_module folders.
 
