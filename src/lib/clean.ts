@@ -15,7 +15,7 @@ function readableBytes(bytes: number) {
 
   const math = (bytes / Math.pow(1024, i)) * 1;
 
-  return math.toFixed(2) + ' ' + sizes[i];
+  return math ? math.toFixed(2) + ' ' + sizes[i] : `Unknown`;
 }
 
 async function filterMatchingDirs(path: string, depth: number) {
@@ -97,6 +97,7 @@ export async function nodeclean(userOptions?: Partial<Options>) {
     const detailedMatchingPaths = await Promise.all(
       matchingPaths.map(async (mp: { buildDirPath: string; fp: string; editTime: Date }) => {
         const nmSize = await fastFolderSize(mp.fp);
+
         totalSize += nmSize;
 
         return { ...mp, size: readableBytes(nmSize) };
