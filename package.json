@@ -1,6 +1,6 @@
 {
   "name": "@bpleco/nodeclean",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "Global CLI utility for removing those pesky node_module folders",
   "main": "dist/index.js",
   "files": [
@@ -14,7 +14,8 @@
     "clean": "rm -rf dist",
     "dev": "npm run clean && babel --extensions \".ts\" src --out-dir=dist --watch",
     "build": "npm run clean && babel --extensions \".ts\" src --out-dir=dist",
-    "release": "npm run build && npm publish --access public"
+    "release": "npm run build && npm publish --access public",
+    "format": "prettier --write ."
   },
   "author": "Ben Pleco",
   "license": "MIT",
@@ -37,7 +38,8 @@
     "fast-glob": "^3.2.7",
     "figures": "^3.2.0",
     "fs-extra": "^10.0.0",
-    "inquirer": "^8.2.0"
+    "inquirer": "^8.2.0",
+    "prettier": "^2.7.1"
   },
   "tags": [
     "node_modules",
