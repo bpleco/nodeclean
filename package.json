@@ -1,6 +1,6 @@
 {
   "name": "@bpleco/nodeclean",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Global CLI utility for removing those pesky node_module folders",
   "main": "dist/index.js",
   "files": [
@@ -41,10 +41,11 @@
     "inquirer": "^8.2.0",
     "prettier": "^2.7.1"
   },
-  "tags": [
+  "keywords": [
     "node_modules",
     "nodeclean",
-    "rm -rf node_modules"
+    "rm -rf node_modules",
+    "development"
   ],
   "repository": {
     "url": "https://github.com/bpleco/nodeclean"
