@@ -41,11 +41,13 @@ nodeclean -d 5 -l 0
 ##### Delete node_modules within 25 subdirectories of parent and clean up build directories named 'dist' whilst there
 
 ```bash
-nodeclean -d 5 -l 0 -b dist
+nodeclean -d 25 -b dist
 ```
 
-## Final Thoughts
+## Notes
 
-I wrote this CLI program as a fun first open source program. I was also tired of having gigabytes of node_module folders lying around on my computer. I hope you find it useful.
+I wrote this CLI program as a fun first open source program. I was also tired of having gigabytes of node_module folders lying around on my computer.
+
+I hope you find it useful.
 
 If you find any issues or bugs please let me know via Github issues.
