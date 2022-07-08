@@ -4,8 +4,8 @@ const program = require('commander');
 program.version(`nodeclean - ${require('../package').version}`).usage('[options]');
 
 program
-  .option('-p --path [path]', 'path to parent dir to being filter in [defaults CWD]')
-  .option('-d --depth [depth]', 'the depth of dir to search [defaults 2]')
+  .option('-p --path [path]', 'path to parent dir to begin filter in [defaults CWD]')
+  .option('-d --depth [depth]', 'the depth of subdirs to search [defaults 2]')
   .option(
     '-l --last-edit [lastEdit]',
     `only detect node_modules folders where the parent hasn't been edited in X amount of days, \npass 0 to delete regardless of last edit [default 7]`,
