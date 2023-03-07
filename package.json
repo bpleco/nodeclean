@@ -1,6 +1,6 @@
 {
   "name": "@bpleco/nodeclean",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Global CLI utility for removing those pesky node_module folders",
   "main": "dist/index.js",
   "files": [
@@ -20,8 +20,8 @@
   "author": "Ben Pleco",
   "license": "MIT",
   "devDependencies": {
-    "@babel/cli": "^7.16.0",
-    "@babel/core": "^7.16.0",
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.0",
     "@babel/helper-module-imports": "^7.16.0",
     "@babel/node": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
@@ -35,7 +35,7 @@
     "chalk": "^4.1.2",
     "commander": "^8.3.0",
     "fast-folder-size": "^1.6.1",
-    "fast-glob": "^3.2.7",
+    "fast-glob": "^3.2.12",
     "figures": "^3.2.0",
     "fs-extra": "^10.0.0",
     "inquirer": "^8.2.0",
